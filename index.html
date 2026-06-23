@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>❤️ Make a Surprise</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{min-height:100vh;overflow-y:auto;
+  background:#0a001a;
+  font-family:system-ui,sans-serif;color:#fff;
+  padding:28px 16px 80px;}
+
+.page{max-width:480px;margin:0 auto;}
+
+h1{font-size:2.4rem;font-weight:900;text-align:center;margin-bottom:6px;
+  background:linear-gradient(135deg,#ff6b9d,#ff1f55);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.tagline{text-align:center;font-size:.8rem;color:rgba(255,200,190,.4);
+  letter-spacing:.2em;margin-bottom:32px;}
+
+/* ── STEP CARDS ── */
+.card{background:rgba(255,255,255,.05);border:1px solid rgba(255,60,100,.2);
+  border-radius:16px;padding:20px;margin-bottom:16px;}
+.card label{display:block;font-size:.8rem;color:rgba(255,170,150,.6);
+  letter-spacing:.12em;margin-bottom:8px;text-transform:uppercase;}
+
+/* Name input */
+#name{width:100%;background:transparent;border:none;
+  border-bottom:2px solid rgba(255,60,100,.35);
+  padding:8px 2px;color:#fff;font-size:1.8rem;font-weight:700;
+  text-align:center;outline:none;font-family:inherit;
+  caret-color:#ff1f55;}
+#name:focus{border-bottom-color:rgba(255,60,100,.8);}
+#name::placeholder{color:rgba(255,150,150,.2);font-size:1.4rem;}
+
+/* Photo area */
+.drop-area{border:2px dashed rgba(255,60,100,.3);border-radius:10px;
+  padding:28px 16px;text-align:center;cursor:pointer;
+  transition:all .25s;margin-bottom:10px;user-select:none;}
+.drop-area:hover{border-color:rgba(255,60,100,.7);background:rgba(255,60,100,.06);}
+.drop-area.over{border-color:#ff1f55;background:rgba(255,31,85,.1);}
+.drop-area p{font-size:.9rem;color:rgba(255,200,180,.6);margin-top:4px;}
+.drop-area .icon{font-size:2.2rem;display:block;margin-bottom:6px;}
+#file-input{display:none;}
+
+/* Thumbnails */
+#thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.thumb{width:56px;height:56px;border-radius:8px;
+  background-size:cover;background-position:center;
+  border:2px solid rgba(80,220,120,.5);
+  position:relative;cursor:pointer;}
+.thumb::after{content:'×';position:absolute;top:-7px;right:-7px;
+  width:18px;height:18px;background:#ff1f55;color:#fff;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:.7rem;font-weight:900;line-height:18px;text-align:center;}
+
+#photo-status{font-size:.8rem;color:rgba(100,220,120,.8);
+  margin-top:6px;min-height:18px;}
+
+/* Generate button */
+#gen-btn{width:100%;padding:15px;border:none;border-radius:50px;
+  background:linear-gradient(135deg,#ff1f55,#ff6080);
+  color:#fff;font-size:1.05rem;font-weight:700;letter-spacing:.15em;
+  cursor:pointer;margin-top:6px;
+  box-shadow:0 0 28px rgba(255,31,85,.4);
+  transition:transform .2s,box-shadow .2s;}
+#gen-btn:hover:not(:disabled){transform:scale(1.03);
+  box-shadow:0 0 45px rgba(255,31,85,.65);}
+#gen-btn:disabled{opacity:.3;cursor:not-allowed;transform:none;}
+
+/* Result */
+#result{margin-top:20px;display:none;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,60,100,.25);
+  border-radius:16px;padding:20px;}
+#result h2{font-size:1.1rem;font-weight:700;margin-bottom:5px;
+  color:rgba(255,230,220,.95);}
+#result p{font-size:.75rem;color:rgba(255,185,170,.4);
+  margin-bottom:14px;line-height:1.6;}
+
+/* Link textarea — always editable so user can select/copy */
+#link-out{width:100%;background:rgba(0,0,0,.4);
+  border:1px solid rgba(255,60,100,.25);border-radius:8px;
+  padding:10px 12px;color:rgba(255,215,195,.9);
+  font-size:.75rem;line-height:1.5;resize:vertical;
+  font-family:monospace;min-height:70px;margin-bottom:10px;
+  word-break:break-all;}
+#link-info{font-size:.68rem;color:rgba(255,150,130,.35);
+  margin-bottom:12px;letter-spacing:.08em;}
+
+.share-row{display:flex;gap:8px;flex-wrap:wrap;}
+.share-btn{flex:1;min-width:80px;padding:11px 10px;border:none;
+  border-radius:40px;cursor:pointer;font-size:.82rem;font-weight:700;
+  letter-spacing:.09em;color:#fff;display:flex;align-items:center;
+  justify-content:center;gap:6px;transition:transform .2s;}
+.share-btn:hover{transform:scale(1.04);}
+.share-btn.copy{background:linear-gradient(135deg,#ff1f55,#ff6080);}
+.share-btn.wa  {background:linear-gradient(135deg,#25d366,#1a9647);}
+.share-btn.tg  {background:linear-gradient(135deg,#2196f3,#0d47a1);}
+
+.note{font-size:.65rem;color:rgba(255,170,150,.25);
+  margin-top:12px;line-height:2;text-align:center;}
+
+/* Toast */
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  background:rgba(5,0,15,.96);border:1px solid rgba(255,60,100,.3);
+  border-radius:28px;padding:10px 22px;font-size:.82rem;
+  color:rgba(255,220,210,.95);opacity:0;pointer-events:none;
+  transition:opacity .3s;z-index:99;white-space:nowrap;
+  max-width:88vw;overflow:hidden;text-overflow:ellipsis;}
+#toast.show{opacity:1;}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <h1>Surprise ❤️</h1>
+  <p class="tagline">no account · no upload · instant link</p>
+
+  <!-- NAME -->
+  <div class="card">
+    <label for="name">Step 1 — Their Name</label>
+    <input id="name" type="text" placeholder="Name..." maxlength="20"
+      autocomplete="off" spellcheck="false"/>
+  </div>
+
+  <!-- PHOTOS -->
+  <div class="card">
+    <label>Step 2 — Your Photos (up to 5)</label>
+    <div class="drop-area" id="drop-area" onclick="document.getElementById('file-input').click()">
+      <span class="icon">📷</span>
+      <strong>Tap here to select photos</strong>
+      <p>Or drag &amp; drop · compressed automatically · no upload needed</p>
+    </div>
+    <input type="file" id="file-input" accept="image/*" multiple/>
+    <div id="thumbs"></div>
+    <div id="photo-status"></div>
+  </div>
+
+  <!-- GENERATE -->
+  <button id="gen-btn" disabled onclick="generate()">
+    ✦ Generate Surprise Link ✦
+  </button>
+
+  <!-- RESULT (always in DOM, shown by JS) -->
+  <div id="result">
+    <h2>🎉 Your Surprise Link is Ready!</h2>
+    <p>Copy this link and send to your loved one.<br/>
+       She opens it → music plays → photos slideshow → lyrics sync ❤️</p>
+    <textarea id="link-out" readonly onclick="this.select()"></textarea>
+    <div id="link-info"></div>
+    <div class="share-row">
+      <button class="share-btn copy" onclick="copyLink()">📋 Copy</button>
+      <button class="share-btn wa"   onclick="sendWA()">💬 WhatsApp</button>
+      <button class="share-btn tg"   onclick="sendTG()">✈️ Telegram</button>
+    </div>
+    <p class="note">
+      ✦ Everything lives inside the link — no server, no account<br/>
+      ✦ Works on any phone or computer<br/>
+      ✦ For very long links, Telegram or copy-paste works best
+    </p>
+  </div>
+
+</div>
+<div id="toast"></div>
+
+<script>
+/* ── State ─────────────────────────────────────────────── */
+var photos = [];   /* array of compressed JPEG data-URLs */
+var _link  = '';
+
+/* ── Validate: enable/disable the Generate button ─────── */
+function check() {
+  var name = document.getElementById('name').value.trim();
+  document.getElementById('gen-btn').disabled = !(name && photos.length > 0);
+}
+
+document.getElementById('name').addEventListener('input', check);
+
+/* ── File input ────────────────────────────────────────── */
+document.getElementById('file-input').addEventListener('change', function(e) {
+  processFiles(Array.from(e.target.files));
+  e.target.value = '';
+});
+
+/* ── Drag & drop ───────────────────────────────────────── */
+var da = document.getElementById('drop-area');
+da.addEventListener('dragover',  function(e){ e.preventDefault(); da.classList.add('over'); });
+da.addEventListener('dragleave', function()  { da.classList.remove('over'); });
+da.addEventListener('drop', function(e) {
+  e.preventDefault(); da.classList.remove('over');
+  processFiles(Array.from(e.dataTransfer.files).filter(function(f){
+    return f.type.startsWith('image/');
+  }));
+});
+
+/* ── Process files: read → resize → compress ───────────── */
+function processFiles(files) {
+  var allowed = files.filter(function(f){ return f.type.startsWith('image/'); });
+  var slots   = 5 - photos.length;
+  if (slots <= 0) { toast('Maximum 5 photos'); return; }
+  allowed.slice(0, slots).forEach(function(file) {
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      var img = new Image();
+      img.onload = function() {
+        /* Resize to 240px max side */
+        var MAX = 240;
+        var w = img.naturalWidth, h = img.naturalHeight;
+        var r = Math.min(MAX/w, MAX/h, 1); /* never upscale */
+        w = Math.round(w*r); h = Math.round(h*r);
+        var cv = document.createElement('canvas');
+        cv.width = w; cv.height = h;
+        cv.getContext('2d').drawImage(img, 0, 0, w, h);
+        /* Quality 0.3 → ~4KB per photo */
+        var dataUrl = cv.toDataURL('image/jpeg', 0.3);
+        photos.push(dataUrl);
+        addThumb(dataUrl);
+        document.getElementById('photo-status').textContent =
+          '✅ ' + photos.length + ' photo' + (photos.length>1?'s':'') + ' ready';
+        check();
+      };
+      img.onerror = function(){ toast('Could not read image'); };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function addThumb(dataUrl) {
+  var row = document.getElementById('thumbs');
+  var d   = document.createElement('div');
+  d.className = 'thumb';
+  d.style.backgroundImage = "url('" + dataUrl + "')";
+  d.title = 'Click to remove';
+  d.onclick = function() {
+    var i = photos.indexOf(dataUrl);
+    if (i >= 0) photos.splice(i, 1);
+    d.remove();
+    document.getElementById('photo-status').textContent =
+      photos.length > 0
+        ? '✅ ' + photos.length + ' photo' + (photos.length>1?'s':'') + ' ready'
+        : '';
+    check();
+  };
+  row.appendChild(d);
+}
+
+/* ── Generate link ─────────────────────────────────────── */
+function generate() {
+  var name = document.getElementById('name').value.trim();
+  if (!name)           { toast('Enter a name first');         return; }
+  if (!photos.length)  { toast('Select at least one photo'); return; }
+
+  /* Build payload and encode safely */
+  var payload = JSON.stringify({ n: name, p: photos });
+  var encoded = '';
+  try {
+    /* TextEncoder → UTF-8 bytes → base64 — most reliable method */
+    var bytes = new TextEncoder().encode(payload);
+    var binary = '';
+    for (var i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+    encoded = btoa(binary);
+  } catch(e) {
+    toast('Encoding error — try fewer/smaller photos');
+    return;
+  }
+
+  /* Build the URL */
+  var base = location.href.replace(/index\.html[\s\S]*$/, '').replace(/\?[\s\S]*$/,'');
+  if (!base.endsWith('/')) base += '/';
+  _link = base + 'view.html#' + encoded;
+
+  /* Show the result section */
+  var result = document.getElementById('result');
+  result.style.display = 'block';
+
+  /* Fill the textarea */
+  document.getElementById('link-out').value = _link;
+
+  /* Show size info */
+  var kb = (_link.length / 1024).toFixed(1);
+  document.getElementById('link-info').textContent =
+    '📏 ' + kb + 'KB · ' + photos.length + ' photo' +
+    (photos.length > 1 ? 's' : '') + ' inside the link';
+
+  /* Scroll result into view */
+  result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+/* ── Share helpers ─────────────────────────────────────── */
+function copyLink() {
+  if (!_link) return;
+  var ta = document.getElementById('link-out');
+  ta.select();
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(_link)
+      .then(function(){ toast('✅ Copied! Send it to her ❤️'); })
+      .catch(function(){
+        try { document.execCommand('copy'); toast('✅ Copied!'); }
+        catch(e){ toast('Long-press the link to copy'); }
+      });
+  } else {
+    try { document.execCommand('copy'); toast('✅ Copied!'); }
+    catch(e){ toast('Long-press the link to copy'); }
+  }
+}
+
+function sendWA() {
+  if (_link) window.open(
+    'https://wa.me/?text=' + encodeURIComponent('❤️ I made something for you 🌹\n' + _link),
+    '_blank');
+}
+function sendTG() {
+  if (_link) window.open(
+    'https://t.me/share/url?url=' + encodeURIComponent(_link) +
+    '&text=' + encodeURIComponent('❤️ I made something special for you 🌹'),
+    '_blank');
+}
+
+/* ── Toast ─────────────────────────────────────────────── */
+var _tt = null;
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(_tt); _tt = setTimeout(function(){ t.classList.remove('show'); }, 3000);
+}
+</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a104d943bc7a2fd3',t:'MTc4MjIzMTkyNg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
