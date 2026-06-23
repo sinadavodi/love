@@ -1,6 +1,6 @@
-# 💕 Romantic Surprise — Setareh Mishi
+# 💕 Romantic Surprise — 
 
-A cinematic romantic experience powered by sina davodi with this song  Behnam Bani's "Setareh Mishi".
+A cinematic romantic experience created by sina davodi 
 
 ## 🚀 How to use
 
