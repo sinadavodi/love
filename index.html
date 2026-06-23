@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>❤️ Make a Surprise</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{min-height:100vh;overflow-y:auto;
+  background:#0a001a;
+  font-family:system-ui,sans-serif;color:#fff;
+  padding:28px 16px 80px;}
+.page{max-width:500px;margin:0 auto;}
+h1{font-size:2.2rem;font-weight:900;text-align:center;margin-bottom:6px;
+  background:linear-gradient(135deg,#ff6b9d,#ff1f55);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.tagline{text-align:center;font-size:.8rem;color:rgba(255,200,190,.4);
+  letter-spacing:.2em;margin-bottom:28px;}
+.card{background:rgba(255,255,255,.05);border:1px solid rgba(255,60,100,.2);
+  border-radius:16px;padding:20px;margin-bottom:14px;}
+.card label,.card .clabel{display:block;font-size:.75rem;color:rgba(255,170,150,.6);
+  letter-spacing:.12em;margin-bottom:10px;text-transform:uppercase;}
+#name{width:100%;background:transparent;border:none;
+  border-bottom:2px solid rgba(255,60,100,.35);
+  padding:8px 2px;color:#fff;font-size:1.7rem;font-weight:700;
+  text-align:center;outline:none;font-family:inherit;
+  caret-color:#ff1f55;}
+#name:focus{border-bottom-color:rgba(255,60,100,.8);}
+#name::placeholder{color:rgba(255,150,150,.2);font-size:1.3rem;}
+
+/* Song selector tabs */
+.tabs{display:flex;gap:4px;margin-bottom:14px;background:rgba(0,0,0,.3);
+  border-radius:10px;padding:4px;}
+.tab{flex:1;padding:8px 6px;border:none;border-radius:8px;cursor:pointer;
+  background:transparent;color:rgba(255,170,150,.5);font-size:.78rem;
+  font-weight:600;transition:all .2s;text-align:center;}
+.tab.active{background:rgba(255,31,85,.25);color:#fff;
+  box-shadow:0 0 12px rgba(255,31,85,.2);}
+
+/* Song mode panels */
+.song-panel{display:none;}
+.song-panel.active{display:block;}
+
+/* YT URL input */
+.url-input-wrap{position:relative;}
+#yt-url{width:100%;background:rgba(0,0,0,.4);
+  border:1px solid rgba(255,60,100,.3);border-radius:10px;
+  padding:10px 14px;color:#fff;font-size:.9rem;outline:none;
+  font-family:inherit;}
+#yt-url:focus{border-color:rgba(255,60,100,.7);}
+#yt-url::placeholder{color:rgba(255,150,150,.25);}
+#yt-status{font-size:.75rem;margin-top:6px;min-height:18px;}
+.ok{color:rgba(80,220,120,.8);} .er{color:rgba(255,100,80,.8);}
+
+/* Lyrics area */
+.lyrics-section{margin-top:14px;}
+.lyrics-tabs{display:flex;gap:4px;margin-bottom:10px;}
+.ltab{flex:1;padding:7px;border:none;border-radius:8px;cursor:pointer;
+  background:rgba(0,0,0,.3);color:rgba(255,170,150,.5);font-size:.75rem;
+  font-weight:600;transition:all .2s;}
+.ltab.active{background:rgba(255,31,85,.2);color:#fff;}
+.lpanel{display:none;}
+.lpanel.active{display:block;}
+#lyrics-text{width:100%;background:rgba(0,0,0,.35);
+  border:1px solid rgba(255,60,100,.25);border-radius:10px;
+  padding:10px 12px;color:rgba(255,225,215,.9);font-size:.9rem;
+  line-height:1.7;resize:vertical;font-family:inherit;min-height:110px;
+  outline:none;}
+#lyrics-text:focus{border-color:rgba(255,60,100,.6);}
+#lyrics-text::placeholder{color:rgba(255,150,150,.2);font-size:.82rem;}
+.srt-drop{border:2px dashed rgba(255,60,100,.3);border-radius:10px;
+  padding:22px;text-align:center;cursor:pointer;transition:all .25s;}
+.srt-drop:hover,.srt-drop.over{border-color:rgba(255,60,100,.7);
+  background:rgba(255,60,100,.06);}
+.srt-drop p{font-size:.82rem;color:rgba(255,200,180,.55);}
+.srt-drop .ic{font-size:1.8rem;display:block;margin-bottom:5px;}
+#srt-status{font-size:.75rem;margin-top:6px;min-height:16px;}
+#srt-file-input{display:none;}
+
+/* Photo area */
+.drop-area{border:2px dashed rgba(255,60,100,.3);border-radius:10px;
+  padding:24px 16px;text-align:center;cursor:pointer;
+  transition:all .25s;margin-bottom:10px;user-select:none;}
+.drop-area:hover{border-color:rgba(255,60,100,.7);background:rgba(255,60,100,.06);}
+.drop-area.over{border-color:#ff1f55;background:rgba(255,31,85,.1);}
+.drop-area p{font-size:.85rem;color:rgba(255,200,180,.6);margin-top:4px;}
+.drop-area .icon{font-size:2rem;display:block;margin-bottom:5px;}
+#file-input{display:none;}
+#thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.thumb{width:54px;height:54px;border-radius:8px;
+  background-size:cover;background-position:center;
+  border:2px solid rgba(80,220,120,.5);
+  position:relative;cursor:pointer;}
+.thumb::after{content:'×';position:absolute;top:-7px;right:-7px;
+  width:18px;height:18px;background:#ff1f55;color:#fff;
+  border-radius:50%;font-size:.7rem;font-weight:900;
+  line-height:18px;text-align:center;display:block;}
+#photo-status{font-size:.78rem;color:rgba(100,220,120,.8);margin-top:6px;min-height:18px;}
+
+/* MP3 upload */
+.mp3-drop{border:2px dashed rgba(255,60,100,.3);border-radius:10px;
+  padding:22px;text-align:center;cursor:pointer;transition:all .25s;}
+.mp3-drop:hover,.mp3-drop.over{border-color:rgba(255,60,100,.7);
+  background:rgba(255,60,100,.06);}
+.mp3-drop p{font-size:.82rem;color:rgba(255,200,180,.55);}
+.mp3-drop .ic{font-size:1.8rem;display:block;margin-bottom:5px;}
+#mp3-status{font-size:.75rem;margin-top:6px;min-height:16px;}
+#mp3-file-input{display:none;}
+
+/* Generate button */
+#gen-btn{width:100%;padding:15px;border:none;border-radius:50px;
+  background:linear-gradient(135deg,#ff1f55,#ff6080);
+  color:#fff;font-size:1.05rem;font-weight:700;letter-spacing:.15em;
+  cursor:pointer;margin-top:4px;
+  box-shadow:0 0 28px rgba(255,31,85,.4);
+  transition:transform .2s,box-shadow .2s;}
+#gen-btn:hover:not(:disabled){transform:scale(1.03);
+  box-shadow:0 0 45px rgba(255,31,85,.65);}
+#gen-btn:disabled{opacity:.3;cursor:not-allowed;transform:none;}
+
+/* Result */
+#result{margin-top:18px;display:none;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,60,100,.25);
+  border-radius:16px;padding:20px;}
+#result h2{font-size:1.1rem;font-weight:700;margin-bottom:5px;
+  color:rgba(255,230,220,.95);}
+#result p{font-size:.75rem;color:rgba(255,185,170,.4);
+  margin-bottom:14px;line-height:1.6;}
+#link-out{width:100%;background:rgba(0,0,0,.4);
+  border:1px solid rgba(255,60,100,.25);border-radius:8px;
+  padding:10px 12px;color:rgba(255,215,195,.9);
+  font-size:.72rem;line-height:1.5;resize:vertical;
+  font-family:monospace;min-height:70px;margin-bottom:10px;
+  word-break:break-all;}
+#link-info{font-size:.68rem;color:rgba(255,150,130,.35);
+  margin-bottom:12px;letter-spacing:.08em;}
+.share-row{display:flex;gap:8px;flex-wrap:wrap;}
+.share-btn{flex:1;min-width:80px;padding:11px 10px;border:none;
+  border-radius:40px;cursor:pointer;font-size:.82rem;font-weight:700;
+  letter-spacing:.09em;color:#fff;display:flex;align-items:center;
+  justify-content:center;gap:6px;transition:transform .2s;}
+.share-btn:hover{transform:scale(1.04);}
+.share-btn.copy{background:linear-gradient(135deg,#ff1f55,#ff6080);}
+.share-btn.wa  {background:linear-gradient(135deg,#25d366,#1a9647);}
+.share-btn.tg  {background:linear-gradient(135deg,#2196f3,#0d47a1);}
+.note{font-size:.65rem;color:rgba(255,170,150,.25);
+  margin-top:12px;line-height:2;text-align:center;}
+#size-warn{display:none;background:rgba(255,150,0,.1);
+  border:1px solid rgba(255,150,0,.3);border-radius:8px;
+  padding:10px 12px;font-size:.75rem;color:rgba(255,200,100,.8);
+  margin-bottom:10px;line-height:1.6;}
+
+/* Toast */
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  background:rgba(5,0,15,.96);border:1px solid rgba(255,60,100,.3);
+  border-radius:28px;padding:10px 22px;font-size:.82rem;
+  color:rgba(255,220,210,.95);opacity:0;pointer-events:none;
+  transition:opacity .3s;z-index:99;white-space:nowrap;
+  max-width:88vw;overflow:hidden;text-overflow:ellipsis;}
+#toast.show{opacity:1;}
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Surprise ❤️</h1>
+  <p class="tagline">no account · no upload · instant link</p>
+
+  <!-- STEP 1: NAME -->
+  <div class="card">
+    <label for="name">Step 1 — Their Name</label>
+    <input id="name" type="text" placeholder="Name..." maxlength="20"
+      autocomplete="off" spellcheck="false"/>
+  </div>
+
+  <!-- STEP 2: SONG -->
+  <div class="card">
+    <div class="clabel">Step 2 — Song</div>
+    <div class="tabs">
+      <button class="tab active" onclick="setSongMode('builtin')">🎵 Built-in Song</button>
+      <button class="tab" onclick="setSongMode('youtube')">▶️ YouTube</button>
+      <button class="tab" onclick="setSongMode('mp3')">🎤 Upload MP3</button>
+    </div>
+
+    <!-- Built-in -->
+    <div class="song-panel active" id="panel-builtin">
+      <div style="text-align:center;padding:10px 0;">
+        <div style="font-size:1.3rem;margin-bottom:4px;">🎵</div>
+        <div style="font-size:.95rem;font-weight:700;color:rgba(255,220,210,.9);">Behnam Bani – Setareh Mishi</div>
+        <div style="font-size:.72rem;color:rgba(255,170,150,.4);margin-top:4px;">با کلمات همگام‌سازی‌شده ❤️</div>
+      </div>
+    </div>
+
+    <!-- YouTube -->
+    <div class="song-panel" id="panel-youtube">
+      <div class="url-input-wrap">
+        <input id="yt-url" type="text" placeholder="https://youtube.com/watch?v=..."
+          autocomplete="off" oninput="onYtInput()"/>
+      </div>
+      <div id="yt-status"></div>
+
+      <!-- Lyrics for YT -->
+      <div class="lyrics-section">
+        <div class="clabel" style="margin-top:12px;">Lyrics (optional)</div>
+        <div class="lyrics-tabs">
+          <button class="ltab active" onclick="setLrcMode('text')">✏️ Paste Lyrics</button>
+          <button class="ltab" onclick="setLrcMode('srt')">📄 Upload SRT/LRC</button>
+        </div>
+        <div class="lpanel active" id="lpanel-text">
+          <textarea id="lyrics-text" placeholder="Paste the song lyrics here...
+Each line will be shown during the song.
+Leave blank to skip lyrics sync."></textarea>
+        </div>
+        <div class="lpanel" id="lpanel-srt">
+          <div class="srt-drop" id="srt-drop" onclick="document.getElementById('srt-file-input').click()">
+            <span class="ic">📄</span>
+            <strong>Tap to upload SRT or LRC file</strong>
+            <p>Timestamps will be used for sync</p>
+          </div>
+          <input type="file" id="srt-file-input" accept=".srt,.lrc,.vtt,.txt"/>
+          <div id="srt-status"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MP3 Upload -->
+    <div class="song-panel" id="panel-mp3">
+      <div class="mp3-drop" id="mp3-drop" onclick="document.getElementById('mp3-file-input').click()">
+        <span class="ic">🎵</span>
+        <strong>Tap to upload MP3</strong>
+        <p>Recommended: under 2MB · audio stored in link</p>
+      </div>
+      <input type="file" id="mp3-file-input" accept="audio/*"/>
+      <div id="mp3-status"></div>
+
+      <!-- Lyrics for MP3 -->
+      <div class="lyrics-section" id="mp3-lyrics-section" style="display:none;">
+        <div class="clabel" style="margin-top:12px;">Lyrics (optional)</div>
+        <div class="lyrics-tabs">
+          <button class="ltab active" onclick="setMp3LrcMode('text')">✏️ Paste Lyrics</button>
+          <button class="ltab" onclick="setMp3LrcMode('srt')">📄 Upload SRT/LRC</button>
+        </div>
+        <div class="lpanel active" id="mp3-lpanel-text">
+          <textarea id="mp3-lyrics-text" placeholder="Paste the song lyrics here...
+Each line will be shown during the song."></textarea>
+          <div style="font-size:.7rem;color:rgba(255,170,150,.35);margin-top:5px;">Lines will be auto-timed by equal spacing.</div>
+        </div>
+        <div class="lpanel" id="mp3-lpanel-srt">
+          <div class="srt-drop" id="mp3-srt-drop" onclick="document.getElementById('mp3-srt-input').click()">
+            <span class="ic">📄</span>
+            <strong>Tap to upload SRT or LRC file</strong>
+            <p>Timestamps will be used for sync</p>
+          </div>
+          <input type="file" id="mp3-srt-input" accept=".srt,.lrc,.vtt,.txt"/>
+          <div id="mp3-srt-status"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: PHOTOS -->
+  <div class="card">
+    <label>Step 3 — Photos (up to 5)</label>
+    <div class="drop-area" id="drop-area" onclick="document.getElementById('file-input').click()">
+      <span class="icon">📷</span>
+      <strong>Tap here to select photos</strong>
+      <p>Compressed automatically · no upload needed</p>
+    </div>
+    <input type="file" id="file-input" accept="image/*" multiple/>
+    <div id="thumbs"></div>
+    <div id="photo-status"></div>
+  </div>
+
+  <!-- GENERATE -->
+  <button id="gen-btn" disabled onclick="generate()">
+    ✦ Generate Surprise Link ✦
+  </button>
+
+  <!-- RESULT -->
+  <div id="result">
+    <h2>🎉 Your Surprise Link is Ready!</h2>
+    <p>Copy this link and send to your loved one.<br/>
+       She opens it → music plays → photos → lyrics ❤️</p>
+    <div id="size-warn"></div>
+    <textarea id="link-out" readonly onclick="this.select()"></textarea>
+    <div id="link-info"></div>
+    <div class="share-row">
+      <button class="share-btn copy" onclick="copyLink()">📋 Copy</button>
+      <button class="share-btn wa"   onclick="sendWA()">💬 WhatsApp</button>
+      <button class="share-btn tg"   onclick="sendTG()">✈️ Telegram</button>
+    </div>
+    <p class="note">
+      ✦ Everything lives inside the link — no server, no account<br/>
+      ✦ Works on any phone or computer<br/>
+      ✦ For large links, use Telegram or copy-paste
+    </p>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+/* ── State ── */
+var photos = [];
+var _link  = '';
+var songMode = 'builtin';   // 'builtin' | 'youtube' | 'mp3'
+var lrcMode  = 'text';      // for youtube panel
+var mp3LrcMode = 'text';    // for mp3 panel
+var ytVideoId = '';
+var srtData = null;         // parsed [{start,end,text}]
+var mp3SrtData = null;
+var mp3B64 = '';            // base64 of uploaded MP3
+var mp3Name = '';
+
+/* ── Song mode switcher ── */
+function setSongMode(mode) {
+  songMode = mode;
+  document.querySelectorAll('.tab').forEach(function(t,i){
+    t.classList.toggle('active', ['builtin','youtube','mp3'][i] === mode);
+  });
+  document.querySelectorAll('.song-panel').forEach(function(p){
+    p.classList.remove('active');
+  });
+  document.getElementById('panel-' + mode).classList.add('active');
+  check();
+}
+
+/* ── Lyrics mode switchers ── */
+function setLrcMode(m) {
+  lrcMode = m;
+  document.querySelectorAll('#panel-youtube .ltab').forEach(function(t,i){
+    t.classList.toggle('active', ['text','srt'][i] === m);
+  });
+  document.querySelectorAll('#panel-youtube .lpanel').forEach(function(p){
+    p.classList.remove('active');
+  });
+  document.getElementById('lpanel-' + m).classList.add('active');
+}
+function setMp3LrcMode(m) {
+  mp3LrcMode = m;
+  document.querySelectorAll('#panel-mp3 .ltab').forEach(function(t,i){
+    t.classList.toggle('active', ['text','srt'][i] === m);
+  });
+  document.querySelectorAll('#panel-mp3 .lpanel').forEach(function(p){
+    p.classList.remove('active');
+  });
+  document.getElementById('mp3-lpanel-' + m).classList.add('active');
+}
+
+/* ── YouTube URL handling ── */
+function extractYtId(url) {
+  var patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/
+  ];
+  for (var i = 0; i < patterns.length; i++) {
+    var m = url.match(patterns[i]);
+    if (m) return m[1];
+  }
+  return null;
+}
+function onYtInput() {
+  var val = document.getElementById('yt-url').value.trim();
+  var st  = document.getElementById('yt-status');
+  if (!val) { ytVideoId = ''; st.textContent = ''; check(); return; }
+  var id = extractYtId(val);
+  if (id) {
+    ytVideoId = id;
+    st.className = 'ok';
+    st.textContent = '✅ Video ID: ' + id;
+  } else {
+    ytVideoId = '';
+    st.className = 'er';
+    st.textContent = '⚠️ Could not find a YouTube video ID';
+  }
+  check();
+}
+
+/* ── SRT / LRC / VTT parser ── */
+function parseSRT(text) {
+  // Handle LRC format
+  if (text.match(/\[\d{2}:\d{2}/)) return parseLRC(text);
+  // Handle VTT
+  if (text.trim().startsWith('WEBVTT')) return parseVTT(text);
+  // SRT
+  var blocks = text.trim().split(/\n\s*\n/);
+  var result = [];
+  blocks.forEach(function(block) {
+    var lines = block.trim().split('\n');
+    if (lines.length < 2) return;
+    // Skip index line if numeric
+    var start = 0;
+    if (/^\d+$/.test(lines[0].trim())) start = 1;
+    var timeLine = lines[start];
+    var m = timeLine.match(/(\d+):(\d+):(\d+)[,.](\d+)\s*-->\s*(\d+):(\d+):(\d+)[,.](\d+)/);
+    if (!m) return;
+    var s = parseInt(m[1])*3600 + parseInt(m[2])*60 + parseInt(m[3]) + parseInt(m[4])/1000;
+    var e = parseInt(m[5])*3600 + parseInt(m[6])*60 + parseInt(m[7]) + parseInt(m[8])/1000;
+    var txt = lines.slice(start+1).join('\n').replace(/<[^>]+>/g,'').trim();
+    if (txt) result.push([s, e, txt]);
+  });
+  return result;
+}
+function parseLRC(text) {
+  var lines = text.split('\n');
+  var events = [];
+  lines.forEach(function(line) {
+    var m = line.match(/\[(\d+):(\d+)\.(\d+)\](.*)/);
+    if (!m) return;
+    var t = parseInt(m[1])*60 + parseInt(m[2]) + parseInt(m[3])/100;
+    var txt = m[4].trim();
+    if (txt) events.push({ t: t, txt: txt });
+  });
+  var result = [];
+  events.forEach(function(ev, i) {
+    var end = i < events.length-1 ? events[i+1].t : ev.t + 5;
+    result.push([ev.t, end, ev.txt]);
+  });
+  return result;
+}
+function parseVTT(text) {
+  var blocks = text.split(/\n\s*\n/).slice(1);
+  var result = [];
+  blocks.forEach(function(block) {
+    var lines = block.trim().split('\n');
+    var timeLine = lines.find(function(l){ return l.includes('-->'); });
+    if (!timeLine) return;
+    var m = timeLine.match(/(\d+):(\d+)[.:](\d+)\s*-->\s*(\d+):(\d+)[.:](\d+)/);
+    if (!m) return;
+    var s = parseInt(m[1])*60 + parseInt(m[2]) + parseInt(m[3])/1000;
+    var e = parseInt(m[4])*60 + parseInt(m[5]) + parseInt(m[6])/1000;
+    var txt = lines.filter(function(l){ return !l.includes('-->') && l.trim(); }).join('\n').replace(/<[^>]+>/g,'').trim();
+    if (txt) result.push([s, e, txt]);
+  });
+  return result;
+}
+
+/* ── SRT file upload (YouTube panel) ── */
+document.getElementById('srt-file-input').addEventListener('change', function(e) {
+  var file = e.target.files[0]; if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      var parsed = parseSRT(ev.target.result);
+      if (parsed && parsed.length > 0) {
+        srtData = parsed;
+        document.getElementById('srt-status').className = 'ok';
+        document.getElementById('srt-status').textContent = '✅ ' + parsed.length + ' lyric lines loaded';
+      } else {
+        document.getElementById('srt-status').className = 'er';
+        document.getElementById('srt-status').textContent = '⚠️ Could not parse file. Try SRT or LRC format.';
+      }
+    } catch(err) {
+      document.getElementById('srt-status').className = 'er';
+      document.getElementById('srt-status').textContent = '⚠️ Parse error: ' + err.message;
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+/* ── SRT file upload (MP3 panel) ── */
+document.getElementById('mp3-srt-input').addEventListener('change', function(e) {
+  var file = e.target.files[0]; if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      var parsed = parseSRT(ev.target.result);
+      if (parsed && parsed.length > 0) {
+        mp3SrtData = parsed;
+        document.getElementById('mp3-srt-status').className = 'ok';
+        document.getElementById('mp3-srt-status').textContent = '✅ ' + parsed.length + ' lyric lines loaded';
+      } else {
+        document.getElementById('mp3-srt-status').className = 'er';
+        document.getElementById('mp3-srt-status').textContent = '⚠️ Could not parse file.';
+      }
+    } catch(err) {
+      document.getElementById('mp3-srt-status').className = 'er';
+      document.getElementById('mp3-srt-status').textContent = '⚠️ Parse error: ' + err.message;
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+/* ── SRT drop zones ── */
+['srt-drop','mp3-srt-drop'].forEach(function(id) {
+  var el = document.getElementById(id);
+  el.addEventListener('dragover', function(e){ e.preventDefault(); el.classList.add('over'); });
+  el.addEventListener('dragleave', function(){ el.classList.remove('over'); });
+  el.addEventListener('drop', function(e) {
+    e.preventDefault(); el.classList.remove('over');
+    var files = e.dataTransfer.files;
+    if (files[0]) {
+      var inp = id === 'srt-drop' ? 'srt-file-input' : 'mp3-srt-input';
+      // Trigger change manually
+      var dt = new DataTransfer();
+      dt.items.add(files[0]);
+      document.getElementById(inp).files = dt.files;
+      document.getElementById(inp).dispatchEvent(new Event('change'));
+    }
+  });
+});
+
+/* ── MP3 upload ── */
+document.getElementById('mp3-file-input').addEventListener('change', function(e) {
+  var file = e.target.files[0]; if (!file) return;
+  if (!file.type.startsWith('audio/')) { toast('Please select an audio file'); return; }
+  var mb = file.size / 1024 / 1024;
+  var st = document.getElementById('mp3-status');
+  if (mb > 8) {
+    st.className = 'er';
+    st.textContent = '⚠️ File too large (' + mb.toFixed(1) + 'MB). Max ~8MB recommended.';
+    mp3B64 = ''; mp3Name = '';
+    document.getElementById('mp3-lyrics-section').style.display = 'none';
+    check(); return;
+  }
+  st.textContent = '⏳ Loading...'; st.className = '';
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    mp3B64   = ev.target.result; // full data URL
+    mp3Name  = file.name;
+    st.className = 'ok';
+    st.textContent = '✅ ' + file.name + ' (' + mb.toFixed(2) + 'MB)';
+    if (mb > 2) {
+      st.textContent += ' — Large file: link may be too long for WhatsApp';
+    }
+    document.getElementById('mp3-lyrics-section').style.display = 'block';
+    check();
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+});
+
+/* ── MP3 drag & drop ── */
+var mpDrop = document.getElementById('mp3-drop');
+mpDrop.addEventListener('dragover', function(e){ e.preventDefault(); mpDrop.classList.add('over'); });
+mpDrop.addEventListener('dragleave', function(){ mpDrop.classList.remove('over'); });
+mpDrop.addEventListener('drop', function(e) {
+  e.preventDefault(); mpDrop.classList.remove('over');
+  var files = Array.from(e.dataTransfer.files).filter(function(f){ return f.type.startsWith('audio/'); });
+  if (files[0]) {
+    var dt = new DataTransfer(); dt.items.add(files[0]);
+    document.getElementById('mp3-file-input').files = dt.files;
+    document.getElementById('mp3-file-input').dispatchEvent(new Event('change'));
+  }
+});
+
+/* ── Photo validation ── */
+function check() {
+  var name = document.getElementById('name').value.trim();
+  var songOk = false;
+  if (songMode === 'builtin') songOk = true;
+  if (songMode === 'youtube') songOk = !!ytVideoId;
+  if (songMode === 'mp3')     songOk = !!mp3B64;
+  document.getElementById('gen-btn').disabled = !(name && photos.length > 0 && songOk);
+}
+document.getElementById('name').addEventListener('input', check);
+
+/* ── File input for photos ── */
+document.getElementById('file-input').addEventListener('change', function(e) {
+  processFiles(Array.from(e.target.files));
+  e.target.value = '';
+});
+
+/* ── Drag & drop photos ── */
+var da = document.getElementById('drop-area');
+da.addEventListener('dragover',  function(e){ e.preventDefault(); da.classList.add('over'); });
+da.addEventListener('dragleave', function()  { da.classList.remove('over'); });
+da.addEventListener('drop', function(e) {
+  e.preventDefault(); da.classList.remove('over');
+  processFiles(Array.from(e.dataTransfer.files).filter(function(f){
+    return f.type.startsWith('image/');
+  }));
+});
+
+/* ── Process photo files ── */
+var MAX_DIM = 240, QUALITY = 0.3;
+function processFiles(files) {
+  var allowed = files.filter(function(f){ return f.type.startsWith('image/'); });
+  var slots   = 5 - photos.length;
+  if (!slots) { toast('Max 5 photos. Remove one first.'); return; }
+  allowed = allowed.slice(0, slots);
+  var done = 0;
+  allowed.forEach(function(file) {
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      var img = new Image();
+      img.onload = function() {
+        var w = img.width, h = img.height;
+        if (w > MAX_DIM || h > MAX_DIM) {
+          var scale = MAX_DIM / Math.max(w, h);
+          w = Math.round(w * scale); h = Math.round(h * scale);
+        }
+        var c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        var dataUrl = c.toDataURL('image/jpeg', QUALITY);
+        var idx = photos.length;
+        photos.push(dataUrl);
+        addThumb(dataUrl, idx);
+        done++;
+        if (done === allowed.length) {
+          updatePhotoStatus();
+          check();
+        }
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+function updatePhotoStatus() {
+  var s = document.getElementById('photo-status');
+  s.textContent = photos.length > 0
+    ? '✅ ' + photos.length + ' photo' + (photos.length>1?'s':'') + ' ready'
+    : '';
+}
+function addThumb(url, idx) {
+  var s = document.getElementById('thumbs');
+  var d = document.createElement('div');
+  d.className = 'thumb';
+  d.style.backgroundImage = "url('" + url + "')";
+  d.addEventListener('click', function() {
+    photos.splice(idx, 1);
+    s.innerHTML = '';
+    photos.forEach(function(u, i){ addThumb(u, i); });
+    updatePhotoStatus(); check();
+  });
+  s.appendChild(d);
+}
+
+/* ── Lyrics from plain text — auto-timed ── */
+function buildAutoLrc(lyricsText, durationSec) {
+  var lines = lyricsText.split('\n').map(function(l){ return l.trim(); }).filter(function(l){ return l; });
+  if (!lines.length) return [];
+  var dur = durationSec || 240; // assume 4 min if unknown
+  var perLine = dur / lines.length;
+  return lines.map(function(l, i) {
+    return [i * perLine, (i+1) * perLine, l];
+  });
+}
+
+/* ── Generate link ── */
+function generate() {
+  var name = document.getElementById('name').value.trim();
+  if (!name)          { toast('Enter a name first');         return; }
+  if (!photos.length) { toast('Select at least one photo'); return; }
+
+  /* Build payload */
+  var payload = { n: name, p: photos };
+
+  if (songMode === 'builtin') {
+    payload.sm = 'builtin';
+
+  } else if (songMode === 'youtube') {
+    if (!ytVideoId) { toast('Enter a YouTube URL first'); return; }
+    payload.sm = 'yt';
+    payload.yv = ytVideoId;
+    // Lyrics
+    if (lrcMode === 'srt' && srtData && srtData.length > 0) {
+      payload.lrc = srtData;
+    } else {
+      var lt = document.getElementById('lyrics-text').value.trim();
+      if (lt) payload.lrct = lt; // plain text, auto-timed on view side
+    }
+
+  } else if (songMode === 'mp3') {
+    if (!mp3B64) { toast('Upload an MP3 first'); return; }
+    payload.sm = 'mp3';
+    payload.au = mp3B64;
+    // Lyrics
+    if (mp3LrcMode === 'srt' && mp3SrtData && mp3SrtData.length > 0) {
+      payload.lrc = mp3SrtData;
+    } else {
+      var ml = document.getElementById('mp3-lyrics-text').value.trim();
+      if (ml) payload.lrct = ml;
+    }
+  }
+
+  /* Encode */
+  var payloadStr = '';
+  try {
+    payloadStr = JSON.stringify(payload);
+  } catch(e) {
+    toast('Encoding error — try fewer photos');
+    return;
+  }
+
+  var encoded = '';
+  try {
+    var bytes = new TextEncoder().encode(payloadStr);
+    var binary = '';
+    for (var i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+    encoded = btoa(binary);
+  } catch(e) {
+    toast('Encoding error — try fewer/smaller photos');
+    return;
+  }
+
+  var base = location.href.replace(/index\.html[\s\S]*$/, '').replace(/\?[\s\S]*$/,'');
+  if (!base.endsWith('/')) base += '/';
+  _link = base + 'view.html#' + encoded;
+
+  var result = document.getElementById('result');
+  result.style.display = 'block';
+  document.getElementById('link-out').value = _link;
+
+  var kb = (_link.length / 1024).toFixed(1);
+  document.getElementById('link-info').textContent =
+    '📏 ' + kb + 'KB · ' + photos.length + ' photo' + (photos.length > 1 ? 's' : '') +
+    (songMode !== 'builtin' ? ' · ' + songMode + ' song' : '');
+
+  // Size warning
+  var warn = document.getElementById('size-warn');
+  if (_link.length > 50000) {
+    warn.style.display = 'block';
+    warn.textContent = '⚠️ This link is large (' + kb + 'KB). WhatsApp may truncate it — use Telegram or copy-paste instead.';
+  } else {
+    warn.style.display = 'none';
+  }
+
+  result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+/* ── Share helpers ── */
+function copyLink() {
+  if (!_link) return;
+  var ta = document.getElementById('link-out');
+  ta.select();
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(_link)
+      .then(function(){ toast('✅ Copied! Send it to her ❤️'); })
+      .catch(function(){
+        try { document.execCommand('copy'); toast('✅ Copied!'); }
+        catch(e){ toast('Long-press the link to copy'); }
+      });
+  } else {
+    try { document.execCommand('copy'); toast('✅ Copied!'); }
+    catch(e){ toast('Long-press the link to copy'); }
+  }
+}
+function sendWA() {
+  if (_link) window.open(
+    'https://wa.me/?text=' + encodeURIComponent('❤️ I made something for you 🌹\n' + _link),
+    '_blank');
+}
+function sendTG() {
+  if (_link) window.open(
+    'https://t.me/share/url?url=' + encodeURIComponent(_link) +
+    '&text=' + encodeURIComponent('❤️ I made something special for you 🌹'),
+    '_blank');
+}
+
+/* ── Toast ── */
+var _tt = null;
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(_tt); _tt = setTimeout(function(){ t.classList.remove('show'); }, 3000);
+}
+</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a10509e6baa290a2',t:'MTc4MjIzMzkxOA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
